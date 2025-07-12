@@ -22,6 +22,7 @@ class PlotDataEntry:
         slot_state (SlotState): The state of the slot (empty, prefill, decoding)
         request (Optional[Request]): The request being processed in the slot, if any
     """
+
     slot_state: SlotState = SlotState.empty
     request: Optional[Request] = None
 
@@ -36,6 +37,7 @@ class PlotData:
         engine (Engine): Reference to the simulation engine
         metrics (Metrics): Collected performance metrics
     """
+
     num_slots: int
     slots_contents: List[List[PlotDataEntry]]
     engine: "Engine"
@@ -279,11 +281,13 @@ class PlotData:
             zeroline=False,
         )
         fig.update_yaxes(
-            row=2, col=1,
+            row=2,
+            col=1,
             title="Latency, ticks",
         )
         fig.update_yaxes(
-            row=2, col=1,
+            row=2,
+            col=1,
             secondary_y=True,
             title="Queue Size",
             showgrid=False,
@@ -297,15 +301,9 @@ class PlotData:
         )
         return fig
 
-    def show(self, fig: Optional[go.Figure] = None) -> None:
-        """
-        Show the simulation results using Plotly.
-
-        Args:
-            fig (Optional[go.Figure]): The figure to show. If None, render a new one.
-        """
-        fig = fig or self.render()
-        fig.show()
+    def show(self):
+        """Render and return the plotly figure."""
+        return self.render()
 
     def save(self, filename: str = "temp.png", fig: Optional[go.Figure] = None) -> str:
         """
@@ -322,7 +320,9 @@ class PlotData:
             ValueError: If the filename does not contain a valid extension.
         """
         if "." not in filename:
-            raise ValueError("Filename must include an extension (e.g., .png, .svg, .pdf)")
+            raise ValueError(
+                "Filename must include an extension (e.g., .png, .svg, .pdf)"
+            )
         fig = fig or self.render()
         ext = filename.split(".")[-1]
         fig.write_image(filename, format=ext)

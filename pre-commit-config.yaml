@@ -1,0 +1,14 @@
+fail_fast: true
+
+exclude: |
+  (?x)^(
+    .*/(snapshots)/.*|
+  )$
+
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.2
+    hooks:
+      - id: ruff-format
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]

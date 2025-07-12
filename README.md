@@ -251,3 +251,15 @@ Key observations:
 - **ITL**: Inter-token latency (ticks between tokens)
 - **Throughput**: Requests and tokens processed per 1K ticks per instance
 - **Queue Size**: Number of requests waiting to be processed
+
+## Future Tasks:
+
+**Note:**
+This simulator currently models the *core disaggregated inference flow* of [NVIDIA Dynamo](https://github.com/ai-dynamo/dynamo) (separate prefill and decode workers, global prefill queue, and request flow through both phases). However, it does **not yet** implement advanced features such as conditional disaggregation (router logic), KV transfer simulation, prefix cache hit logic, dynamic worker scaling, or distributed infrastructure (NATS/ETCD). These are planned for future development.
+
+- [ ] Add conditional disaggregation (router) to decide if prefill is done locally or remotely
+- [ ] Simulate KV cache transfer time and bandwidth between prefill and decode phases
+- [ ] Implement prefix cache hit logic to sometimes skip or reduce prefill phase
+- [ ] Allow dynamic scaling (add/remove) of prefill and decode workers during simulation
+- [ ] (Advanced) Simulate KV descriptor/layout management and block merging
+- [ ] (Advanced) Model distributed infrastructure (NATS/ETCD) for realistic coordination and scaling

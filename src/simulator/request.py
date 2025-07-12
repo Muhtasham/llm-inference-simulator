@@ -118,6 +118,7 @@ class ChunkedContextRequest(Request):
         total_prefill_chunks (int): Number of chunks to split prefill into
         prefill_chunks_completed (int): Number of chunks processed so far
     """
+
     total_prefill_chunks: int = 4
     prefill_chunks_completed: int = 1
 

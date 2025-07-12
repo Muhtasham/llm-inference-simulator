@@ -10,7 +10,6 @@ Usage:
 """
 
 import argparse
-from typing import Optional
 from rich.console import Console
 import simulator as sim
 import numpy as np
@@ -25,12 +24,14 @@ import plotly.io as pio
 
 console = Console()
 
+
 def save_plot(fig, name: str) -> None:
     """Save plotly figure to plots directory as HTML and PNG."""
     os.makedirs("plots", exist_ok=True)
     if fig is not None:
         pio.write_html(fig, f"plots/{name}.html")
         pio.write_image(fig, f"plots/{name}.png")
+
 
 def run_static_batch() -> None:
     """Example with static batching."""
@@ -50,7 +51,10 @@ def run_static_batch() -> None:
     fig = engine.plot_data.show()
     save_plot(fig, "static_batch")
     sim.extra.print_experiment_metrics(engine)
-    console.print("[green]Plots saved to 'plots/static_batch.html' and 'plots/static_batch.png'.")
+    console.print(
+        "[green]Plots saved to 'plots/static_batch.html' and 'plots/static_batch.png'."
+    )
+
 
 def run_ifb() -> None:
     """Example with In-Flight Batching."""
@@ -72,6 +76,7 @@ def run_ifb() -> None:
     sim.extra.print_experiment_metrics(engine)
     console.print("[green]Plots saved to 'plots/ifb.html' and 'plots/ifb.png'.")
 
+
 def run_chunked_context() -> None:
     """Example with Chunked Context."""
     console.rule("[bold yellow]Chunked Context Example")
@@ -91,7 +96,10 @@ def run_chunked_context() -> None:
     fig = engine.plot_data.show()
     save_plot(fig, "chunked_context")
     sim.extra.print_experiment_metrics(engine)
-    console.print("[green]Plots saved to 'plots/chunked_context.html' and 'plots/chunked_context.png'.")
+    console.print(
+        "[green]Plots saved to 'plots/chunked_context.html' and 'plots/chunked_context.png'."
+    )
+
 
 def run_one_prefill() -> None:
     """Example with One Prefill Per Batch."""
@@ -114,7 +122,10 @@ def run_one_prefill() -> None:
     fig = engine.plot_data.show()
     save_plot(fig, "one_prefill")
     sim.extra.print_experiment_metrics(engine)
-    console.print("[green]Plots saved to 'plots/one_prefill.html' and 'plots/one_prefill.png'.")
+    console.print(
+        "[green]Plots saved to 'plots/one_prefill.html' and 'plots/one_prefill.png'."
+    )
+
 
 def run_concurrent_load() -> None:
     """Example with Concurrent Load Generation."""
@@ -137,7 +148,10 @@ def run_concurrent_load() -> None:
     fig = engine.plot_data.show()
     save_plot(fig, "concurrent_load")
     sim.extra.print_experiment_metrics(engine)
-    console.print("[green]Plots saved to 'plots/concurrent_load.html' and 'plots/concurrent_load.png'.")
+    console.print(
+        "[green]Plots saved to 'plots/concurrent_load.html' and 'plots/concurrent_load.png'."
+    )
+
 
 def run_request_rate() -> None:
     """Example with Request Rate Load Generation."""
@@ -161,7 +175,10 @@ def run_request_rate() -> None:
     save_plot(fig, "request_rate")
     print(f"Final Queue: {len(engine.queue)}")
     sim.extra.print_experiment_metrics(engine)
-    console.print("[green]Plots saved to 'plots/request_rate.html' and 'plots/request_rate.png'.")
+    console.print(
+        "[green]Plots saved to 'plots/request_rate.html' and 'plots/request_rate.png'."
+    )
+
 
 def main():
     parser = argparse.ArgumentParser(description="Batching Strategies Demo")
@@ -198,6 +215,7 @@ def main():
         print("\n")
     if args.strategy in ("request_rate", "all"):
         run_request_rate()
+
 
 if __name__ == "__main__":
     main()

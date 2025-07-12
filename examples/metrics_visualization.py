@@ -9,7 +9,6 @@ Usage:
 """
 
 import argparse
-from typing import Optional
 from rich.console import Console
 from rich.table import Table
 import simulator as sim
@@ -21,12 +20,14 @@ import plotly.io as pio
 
 console = Console()
 
+
 def save_plot(fig, name: str) -> None:
     """Save plotly figure to plots directory as HTML and PNG."""
     os.makedirs("plots", exist_ok=True)
     if fig is not None:
         pio.write_html(fig, f"plots/{name}.html")
         pio.write_image(fig, f"plots/{name}.png")
+
 
 def print_experiment_metrics(engine: sim.Engine) -> None:
     """Print experiment metrics with rich formatting."""
@@ -86,6 +87,7 @@ def print_experiment_metrics(engine: sim.Engine) -> None:
     throughput_table.add_row("Tokens/(1K ticks)/instance", f"{tokens_per_1k_ticks:.2f}")
     console.print(throughput_table)
 
+
 def main():
     parser = argparse.ArgumentParser(description="Metrics Visualization Example")
     parser.add_argument(
@@ -117,7 +119,10 @@ def main():
     print_experiment_metrics(engine)
     fig = engine.plot_data.show()
     save_plot(fig, args.output)
-    console.print(f"[green]Plots saved to 'plots/{args.output}.html' and 'plots/{args.output}.png'.")
+    console.print(
+        f"[green]Plots saved to 'plots/{args.output}.html' and 'plots/{args.output}.png'."
+    )
+
 
 if __name__ == "__main__":
     main()

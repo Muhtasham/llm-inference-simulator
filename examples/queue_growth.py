@@ -20,7 +20,10 @@ from simulator.batcher import IFBatcherWithOnePrefillOnly
 
 console = Console()
 
-def run_simulation(load_generator, time_limit: int, show_plot: bool = False) -> Dict[str, float]:
+
+def run_simulation(
+    load_generator, time_limit: int, show_plot: bool = False
+) -> Dict[str, float]:
     """Run simulation with given load generator and time limit."""
     engine = sim.Engine(
         max_batch_size=4,
@@ -39,7 +42,10 @@ def run_simulation(load_generator, time_limit: int, show_plot: bool = False) -> 
         "e2e_latency": np.mean(metrics.get_e2e_latencies()),
     }
 
-def print_comparison(title: str, short_run: Dict[str, float], long_run: Dict[str, float]) -> None:
+
+def print_comparison(
+    title: str, short_run: Dict[str, float], long_run: Dict[str, float]
+) -> None:
     """Print comparison between short and long runs."""
     console.rule(f"[bold]{title}")
 
@@ -75,6 +81,7 @@ def print_comparison(title: str, short_run: Dict[str, float], long_run: Dict[str
 
     console.print(table)
 
+
 def analyze_request_rate(short_ticks: int, long_ticks: int) -> None:
     """Analyze RequestRateLoadGenerator performance."""
     np.random.seed(42)
@@ -92,6 +99,7 @@ def analyze_request_rate(short_ticks: int, long_ticks: int) -> None:
 
     print_comparison("Request Rate Load Generator", short_run, long_run)
 
+
 def analyze_concurrent_load(short_ticks: int, long_ticks: int) -> None:
     """Analyze ConcurrentLoadGenerator performance."""
     np.random.seed(42)
@@ -108,6 +116,7 @@ def analyze_concurrent_load(short_ticks: int, long_ticks: int) -> None:
     long_run = run_simulation(load_generator, time_limit=long_ticks, show_plot=False)
 
     print_comparison("Concurrent Load Generator", short_run, long_run)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Queue Growth Analysis Example")
@@ -136,6 +145,7 @@ def main():
         print("\n")
     if args.analysis in ("concurrent_load", "all"):
         analyze_concurrent_load(args.short, args.long)
+
 
 if __name__ == "__main__":
     main()

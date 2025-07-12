@@ -11,7 +11,6 @@ Usage:
 """
 
 import argparse
-from typing import Optional
 from rich.console import Console
 from rich.table import Table
 import simulator as sim
@@ -23,12 +22,14 @@ import plotly.io as pio
 
 console = Console()
 
+
 def save_plot(fig, name: str) -> None:
     """Save plotly figure to plots directory as HTML and PNG."""
     os.makedirs("plots", exist_ok=True)
     if fig is not None:
         pio.write_html(fig, f"plots/{name}.html")
         pio.write_image(fig, f"plots/{name}.png")
+
 
 def run_basic_example(time_limit: int = 10) -> None:
     """Run a basic example with 2 slots and 2 initial requests."""
@@ -54,7 +55,10 @@ def run_basic_example(time_limit: int = 10) -> None:
     console.print(table)
     fig = engine.plot_data.show()
     save_plot(fig, "basic_example")
-    console.print("[green]Plots saved to 'plots/basic_example.html' and 'plots/basic_example.png'.")
+    console.print(
+        "[green]Plots saved to 'plots/basic_example.html' and 'plots/basic_example.png'."
+    )
+
 
 def run_complex_example(time_limit: int = 100) -> None:
     """Run a complex example with varying output lengths."""
@@ -89,7 +93,10 @@ def run_complex_example(time_limit: int = 100) -> None:
     console.print(table)
     fig = engine.plot_data.show()
     save_plot(fig, "complex_example")
-    console.print("[green]Plots saved to 'plots/complex_example.html' and 'plots/complex_example.png'.")
+    console.print(
+        "[green]Plots saved to 'plots/complex_example.html' and 'plots/complex_example.png'."
+    )
+
 
 def main():
     parser = argparse.ArgumentParser(description="Batch Duration Demo Examples")
@@ -112,6 +119,7 @@ def main():
         print("\n")
     if args.example in ("complex", "all"):
         run_complex_example(time_limit=args.time_limit or 100)
+
 
 if __name__ == "__main__":
     main()

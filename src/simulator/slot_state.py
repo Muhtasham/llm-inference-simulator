@@ -17,6 +17,7 @@ class SlotState(Enum):
         prefill (1): Slot is processing a request in prefill phase
         decoding (2): Slot is processing a request in decode phase
     """
+
     empty: int = 0
     prefill: int = 1
     decoding: int = 2

@@ -5,6 +5,7 @@ description = "Prefill and Decode Latency Simulator for LLM Inference"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "kaleido>=1.0.0",
     "matplotlib>=3.9.3",
     "numpy>=2.2.0",
     "plotly>=5.24.1",

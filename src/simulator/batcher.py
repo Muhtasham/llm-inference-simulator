@@ -123,3 +123,33 @@ class IFBatcherWithOnePrefillOnly(IFBatcher):
             request = engine.queue.pop(0)
             engine.assign_request_to_slot(request, slot)
             break  # Only one new request can be taken
+
+
+class DisaggregatedPrefillBatcher(Batcher):
+    """
+    Batcher for disaggregated prefill phase. Fills empty prefill slots from prefill_queue.
+    """
+
+    def add_requests(self) -> None:
+        engine = self.engine
+        empty_slots = engine.get_prefill_slots() - engine.get_occupied_prefill_slots()
+        for slot in empty_slots:
+            req = engine.pop_prefill_request()
+            if req is None:
+                break
+            engine.assign_request_to_prefill_slot(req, slot)
+
+
+class DisaggregatedDecodeBatcher(Batcher):
+    """
+    Batcher for disaggregated decode phase. Fills empty decode slots from decode_queue.
+    """
+
+    def add_requests(self) -> None:
+        engine = self.engine
+        empty_slots = engine.get_decode_slots() - engine.get_occupied_decode_slots()
+        for slot in empty_slots:
+            req = engine.pop_decode_request()
+            if req is None:
+                break
+            engine.assign_request_to_decode_slot(req, slot)

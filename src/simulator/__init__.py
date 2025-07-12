@@ -9,9 +9,9 @@ Utility functions for displaying and testing experiment metrics are also provide
 
 from .request import Request
 from .load_generator import LoadGenerator
-from .batcher import Batcher
+from .batcher import Batcher, DisaggregatedPrefillBatcher, DisaggregatedDecodeBatcher
 from .metrics import Metrics
-from .engine import Engine
+from .engine import Engine, DisaggregatedEngine
 from .extra import (
     print_experiment_metrics,
     capture_function_prints,
@@ -24,6 +24,9 @@ __all__ = [
     "Batcher",
     "Metrics",
     "Engine",
+    "DisaggregatedEngine",
+    "DisaggregatedPrefillBatcher",
+    "DisaggregatedDecodeBatcher",
     "print_experiment_metrics",
     "capture_function_prints",
     "check_print_metrics",

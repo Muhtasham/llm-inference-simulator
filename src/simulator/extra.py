@@ -74,7 +74,7 @@ def capture_function_prints(fn: Callable[[], None]) -> str:
 def check_print_metrics(
     print_experiment_metrics_function: Callable[[Any], None],
     engine: Any,
-    show_median: bool = False
+    show_median: bool = False,
 ) -> None:
     """
     Compare the output of a given print_experiment_metrics function to the reference implementation.
