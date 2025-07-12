@@ -92,7 +92,7 @@ class PlotData:
             for time_id, plot_data_entry in enumerate(slot_contents):
                 ti = self.metrics.get_time_interval(time_id)
                 time_interval_str = (
-                    f"{ti[0]:.1f}-{ti[1]:.1f}, ({ti[1]-ti[0]:.1f} ticks)"
+                    f"{ti[0]:.1f}-{ti[1]:.1f}, ({ti[1] - ti[0]:.1f} ticks)"
                 )
                 if plot_data_entry.request is None:
                     row.append(

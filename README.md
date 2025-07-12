@@ -8,12 +8,8 @@ A simulator for exploring different batching strategies and load patterns in LLM
 # Install uv package manager
 pip install uv
 
-# Clone the repository
-git clone https://github.com/muhtasham/simulator.git
-cd simulator
-
 # Install dependencies
-uv pip install -r requirements.txt
+uv sync
 ```
 
 ## Understanding Ticks
