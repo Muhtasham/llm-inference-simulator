@@ -41,7 +41,12 @@ class Request:
     tokens_generated: int = 0
 
     def is_in_prefill(self) -> bool:
-        """Check if request is in prefill phase (no tokens generated yet)."""
+        """
+        Check if request is in prefill phase (no tokens generated yet).
+
+        Returns:
+            bool: True if in prefill phase, False otherwise.
+        """
         return self.tokens_generated == 0
 
     def get_slot_state_at(self, current_time: float) -> SlotState:
@@ -49,7 +54,7 @@ class Request:
         Get the state of the slot containing this request at a given time.
 
         Args:
-            current_time: Time at which to check the state
+            current_time (float): Time at which to check the state
 
         Returns:
             SlotState: Current state (empty, prefill, or decoding)
@@ -70,7 +75,7 @@ class Request:
         Calculate total latency from queue entry to current time.
 
         Args:
-            current_time: Time at which to calculate latency
+            current_time (float): Time at which to calculate latency
 
         Returns:
             float: Current latency in time units
@@ -81,7 +86,7 @@ class Request:
         assert self.added_to_queue_at is not None
         return current_time - self.added_to_queue_at
 
-    def tick(self):
+    def tick(self) -> None:
         """
         Progress the request by one step.
         For standard requests, generates one token.
@@ -113,12 +118,10 @@ class ChunkedContextRequest(Request):
         total_prefill_chunks (int): Number of chunks to split prefill into
         prefill_chunks_completed (int): Number of chunks processed so far
     """
-
-    # into how many chunks in the prefill split
     total_prefill_chunks: int = 4
     prefill_chunks_completed: int = 1
 
-    def tick(self):
+    def tick(self) -> None:
         """
         Progress the request by one step.
         For chunked requests, either completes a prefill chunk

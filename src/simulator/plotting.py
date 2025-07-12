@@ -15,27 +15,56 @@ if TYPE_CHECKING:
 
 @dataclass
 class PlotDataEntry:
+    """
+    Data class representing the state of a slot at a given time.
+
+    Attributes:
+        slot_state (SlotState): The state of the slot (empty, prefill, decoding)
+        request (Optional[Request]): The request being processed in the slot, if any
+    """
     slot_state: SlotState = SlotState.empty
     request: Optional[Request] = None
 
 
 class PlotData:
+    """
+    Class for collecting and visualizing simulation data for LLM inference batching.
+
+    Attributes:
+        num_slots (int): Number of batch slots
+        slots_contents (List[List[PlotDataEntry]]): Slot state history over time
+        engine (Engine): Reference to the simulation engine
+        metrics (Metrics): Collected performance metrics
+    """
     num_slots: int
-    slots_contents: List[List[PlotDataEntry]]  # slots_contents[slot][time]
+    slots_contents: List[List[PlotDataEntry]]
     engine: "Engine"
     metrics: Metrics
 
-    def __init__(self, num_slots, engine):
+    def __init__(self, num_slots: int, engine: "Engine") -> None:
+        """
+        Initialize PlotData with the number of slots and engine reference.
+
+        Args:
+            num_slots (int): Number of batch slots
+            engine (Engine): Reference to the simulation engine
+        """
         self.num_slots = num_slots
         self.slots_contents = [[] for _ in range(num_slots)]
         self.engine = engine
         self.metrics = Metrics(num_slots, engine)
 
-    def track_previous_batch(self):
+    def track_previous_batch(self) -> None:
+        """
+        Track metrics for the previous batch.
+        """
         self.metrics.track_previous_batch()
 
-    def track_current_batch(self):
-        data = []
+    def track_current_batch(self) -> None:
+        """
+        Track the current batch state and update metrics.
+        """
+        data: List[PlotDataEntry] = []
         for s in self.engine.get_all_slots():
             if s in self.engine.get_occupied_slots():
                 pde = PlotDataEntry(
@@ -52,16 +81,35 @@ class PlotData:
         )
         self.metrics.track_current_batch()
 
-    def _add_batch(self, batch, end_time):
+    def _add_batch(self, batch: List[PlotDataEntry], end_time: float) -> None:
+        """
+        Add a batch of slot states to the history and update the time.
+
+        Args:
+            batch (List[PlotDataEntry]): The batch of slot states
+            end_time (float): The end time for this batch
+        """
         for slot, pd in zip(self.slots_contents, batch):
             slot.append(pd)
         self.metrics.times.append(end_time)
 
     def get_plot_z(self) -> List[List[int]]:
+        """
+        Get the slot state values for heatmap plotting.
+
+        Returns:
+            List[List[int]]: 2D list of slot state values
+        """
         return list([s.slot_state.value for s in sc] for sc in self.slots_contents)
 
     def get_plot_annotations(self) -> List[go.layout.Annotation]:
-        annotations = []
+        """
+        Get plot annotations for each slot and time step.
+
+        Returns:
+            List[go.layout.Annotation]: List of plot annotations
+        """
+        annotations: List[go.layout.Annotation] = []
         for slot_id, slot_contents in enumerate(self.slots_contents):
             for time, plot_data_entry in enumerate(slot_contents):
                 annotations.append(
@@ -75,9 +123,15 @@ class PlotData:
         return annotations
 
     def get_plot_text(self) -> List[List[str]]:
-        text = []
+        """
+        Get short text labels for each slot and time step for plotting.
+
+        Returns:
+            List[List[str]]: 2D list of text labels
+        """
+        text: List[List[str]] = []
         for slot_id, slot_contents in enumerate(self.slots_contents):
-            row = []
+            row: List[str] = []
             for time, plot_data_entry in enumerate(slot_contents):
                 row.append(
                     plot_data_entry.slot_state.name[0],
@@ -86,9 +140,15 @@ class PlotData:
         return text
 
     def get_plot_customdata(self) -> List[List[str]]:
-        customdata = []
+        """
+        Get custom hover data for each slot and time step for plotting.
+
+        Returns:
+            List[List[str]]: 2D list of custom hover data
+        """
+        customdata: List[List[str]] = []
         for slot_id, slot_contents in enumerate(self.slots_contents):
-            row = []
+            row: List[str] = []
             for time_id, plot_data_entry in enumerate(slot_contents):
                 ti = self.metrics.get_time_interval(time_id)
                 time_interval_str = (
@@ -118,7 +178,13 @@ class PlotData:
             customdata.append(row)
         return customdata
 
-    def render(self):
+    def render(self) -> go.Figure:
+        """
+        Render the simulation results as a Plotly figure.
+
+        Returns:
+            go.Figure: The rendered Plotly figure
+        """
         engine = self.engine
         # Create the figure
         heatmap = go.Heatmap(
@@ -213,13 +279,11 @@ class PlotData:
             zeroline=False,
         )
         fig.update_yaxes(
-            row=2,
-            col=1,
+            row=2, col=1,
             title="Latency, ticks",
         )
         fig.update_yaxes(
-            row=2,
-            col=1,
+            row=2, col=1,
             secondary_y=True,
             title="Queue Size",
             showgrid=False,
@@ -233,11 +297,33 @@ class PlotData:
         )
         return fig
 
-    def show(self, fig=None):
+    def show(self, fig: Optional[go.Figure] = None) -> None:
+        """
+        Show the simulation results using Plotly.
+
+        Args:
+            fig (Optional[go.Figure]): The figure to show. If None, render a new one.
+        """
         fig = fig or self.render()
         fig.show()
 
-    def save(self, filename="temp.png", fig=None):
+    def save(self, filename: str = "temp.png", fig: Optional[go.Figure] = None) -> str:
+        """
+        Save the simulation results to a file.
+
+        Args:
+            filename (str): The filename to save the figure to. Must include an extension.
+            fig (Optional[go.Figure]): The figure to save. If None, render a new one.
+
+        Returns:
+            str: The filename the figure was saved to
+
+        Raises:
+            ValueError: If the filename does not contain a valid extension.
+        """
+        if "." not in filename:
+            raise ValueError("Filename must include an extension (e.g., .png, .svg, .pdf)")
         fig = fig or self.render()
-        fig.write_image(filename, format=filename[filename.index(".") + 1 :])
+        ext = filename.split(".")[-1]
+        fig.write_image(filename, format=ext)
         return filename

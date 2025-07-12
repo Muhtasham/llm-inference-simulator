@@ -25,7 +25,7 @@ class Batcher:
 
     engine: "Engine"
 
-    def add_requests(self):
+    def add_requests(self) -> None:
         """
         Base implementation of static batching.
 
@@ -41,7 +41,13 @@ class Batcher:
             request = engine.queue.pop(0)
             engine.assign_request_to_slot(request, slot)
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Return the string representation of the batcher class.
+
+        Returns:
+            str: The class name of the batcher.
+        """
         return f"{self.__class__.__name__}"
 
 
@@ -68,7 +74,7 @@ class IFBatcher(Batcher):
 
     engine: "Engine"
 
-    def add_requests(self):
+    def add_requests(self) -> None:
         """
         Add requests using in-flight batching strategy.
 

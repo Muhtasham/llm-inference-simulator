@@ -36,14 +36,15 @@ class Metrics:
     e2e_latency: List[Tuple[float, float]]  # pairs of time, e2e_latency
     ttft: List[Tuple[float, float]]  # pairs of time, ttft
     itl: List[Tuple[float, float]]  # pairs of time, itl
+    osl: List[Tuple[float, float]]  # pairs of time, output sequence length
 
-    def __init__(self, num_slots, engine):
+    def __init__(self, num_slots: int, engine: "Engine") -> None:
         """
         Initialize metrics collection.
 
         Args:
-            num_slots: Number of batch slots to track
-            engine: Reference to simulation engine
+            num_slots (int): Number of batch slots to track
+            engine (Engine): Reference to simulation engine
         """
         self.num_slots = num_slots
         self.engine = engine
@@ -54,7 +55,7 @@ class Metrics:
         self.itl = []
         self.osl = []  # target_output_len_tokens
 
-    def track_previous_batch(self):
+    def track_previous_batch(self) -> None:
         """
         Record metrics for the previous batch.
 
@@ -82,8 +83,9 @@ class Metrics:
                     (self.engine.current_time, req.target_output_len_tokens)
                 )
 
-    def track_current_batch(self):
-        """Record metrics for the current batch.
+    def track_current_batch(self) -> None:
+        """
+        Record metrics for the current batch.
 
         Tracks:
         - Current queue size
@@ -96,11 +98,12 @@ class Metrics:
                     (self.engine.current_time, self.engine.get_current_batch_duration())
                 )
 
-    def get_time_interval(self, time_id: int):
-        """Get time interval for a specific measurement.
+    def get_time_interval(self, time_id: int) -> Tuple[float, float]:
+        """
+        Get time interval for a specific measurement.
 
         Args:
-            time_id: Index of the measurement
+            time_id (int): Index of the measurement
 
         Returns:
             Tuple[float, float]: Start and end time of the interval
@@ -108,11 +111,12 @@ class Metrics:
         return (self.times[time_id], self.times[time_id + 1])
 
     @classmethod
-    def get_values(cls, latencies):
-        """Extract just the latency values from time-value pairs.
+    def get_values(cls, latencies: List[Tuple[float, float]]) -> List[float]:
+        """
+        Extract just the latency values from time-value pairs.
 
         Args:
-            latencies: List of (time, value) tuples
+            latencies (List[Tuple[float, float]]): List of (time, value) tuples
 
         Returns:
             List[float]: List of just the values
@@ -123,17 +127,37 @@ class Metrics:
         return list(latency for time, latency in latencies)
 
     def get_e2e_latencies(self) -> List[float]:
-        """Get list of all end-to-end latency measurements."""
+        """
+        Get list of all end-to-end latency measurements.
+
+        Returns:
+            List[float]: List of E2E latencies
+        """
         return Metrics.get_values(self.e2e_latency)
 
     def get_ttfts(self) -> List[float]:
-        """Get list of all time to first token measurements."""
+        """
+        Get list of all time to first token measurements.
+
+        Returns:
+            List[float]: List of TTFTs
+        """
         return Metrics.get_values(self.ttft)
 
     def get_itls(self) -> List[float]:
-        """Get list of all inter-token latency measurements."""
+        """
+        Get list of all inter-token latency measurements.
+
+        Returns:
+            List[float]: List of ITLs
+        """
         return Metrics.get_values(self.itl)
 
     def get_osls(self) -> List[float]:
-        """Get list of all output sequence length measurements."""
+        """
+        Get list of all output sequence length measurements.
+
+        Returns:
+            List[float]: List of output sequence lengths
+        """
         return Metrics.get_values(self.osl)

@@ -5,12 +5,18 @@ This module provides a simulation engine for LLM inference batching strategies.
 It models how different batching approaches affect throughput and latency.
 """
 
-from typing import List, Dict, Set
+from typing import List, Dict, Set, TYPE_CHECKING
 
 from .request import Request
 from .plotting import PlotData
 from .load_generator import LoadGenerator
 from .batcher import Batcher
+
+if TYPE_CHECKING:
+    from .request import Request
+    from .plotting import PlotData
+    from .load_generator import LoadGenerator
+    from .batcher import Batcher
 
 
 class Engine:
@@ -34,21 +40,21 @@ class Engine:
     max_batch_size: int
     queue: List[Request]
     current_batch: Dict[int, Request]
-    current_time: float = 0.0
+    current_time: float
     plot_data: PlotData
     batcher: Batcher
     load_generator: LoadGenerator
 
     def __init__(
         self, max_batch_size: int, load_generator: LoadGenerator, batcher: Batcher
-    ):
+    ) -> None:
         """
         Initialize the simulation engine.
 
         Args:
-            max_batch_size: Maximum number of parallel requests
-            load_generator: Strategy for generating inference requests
-            batcher: Strategy for batching requests
+            max_batch_size (int): Maximum number of parallel requests
+            load_generator (LoadGenerator): Strategy for generating inference requests
+            batcher (Batcher): Strategy for batching requests
         """
         self.max_batch_size = max_batch_size
         self.plot_data = PlotData(num_slots=max_batch_size, engine=self)
@@ -58,8 +64,9 @@ class Engine:
         self.current_batch = {}
         self.batcher = batcher
         self.batcher.engine = self
+        self.current_time = 0.0
 
-    def run(self, time_limit: float = 10.0):
+    def run(self, time_limit: float = 10.0) -> None:
         """
         Run the simulation until the time limit is reached.
 
@@ -71,7 +78,7 @@ class Engine:
         5. Add new requests to batch
 
         Args:
-            time_limit: How long to run the simulation
+            time_limit (float): How long to run the simulation
         """
         while self.current_time < time_limit:
             # generate tokens
@@ -98,25 +105,35 @@ class Engine:
             self.current_time += duration
 
     def get_all_slots(self) -> Set[int]:
-        """Return all available slot indices."""
+        """
+        Return all available slot indices.
+
+        Returns:
+            Set[int]: Set of all slot indices.
+        """
         return set(range(self.max_batch_size))
 
     def get_occupied_slots(self) -> Set[int]:
-        """Return indices of slots currently processing requests."""
+        """
+        Return indices of slots currently processing requests.
+
+        Returns:
+            Set[int]: Set of occupied slot indices.
+        """
         return set(self.current_batch.keys())
 
-    def assign_request_to_slot(self, req: Request, slot: int):
+    def assign_request_to_slot(self, req: Request, slot: int) -> None:
         """
         Assign a request to a specific batch slot.
 
         Args:
-            req: Request to be processed
-            slot: Slot index to assign the request to
+            req (Request): Request to be processed
+            slot (int): Slot index to assign the request to
         """
         req.started_at = self.current_time
         self.current_batch[slot] = req
 
-    def add_requests_ifb(self):
+    def add_requests_ifb(self) -> None:
         """
         Add requests using in-flight batching strategy.
         Fills empty slots with requests from the queue.
@@ -129,11 +146,21 @@ class Engine:
             self.assign_request_to_slot(req, slot)
 
     def get_prefilling_requests(self) -> List[Request]:
-        """Return list of requests currently in prefill phase."""
+        """
+        Return list of requests currently in prefill phase.
+
+        Returns:
+            List[Request]: Requests in prefill phase.
+        """
         return [req for req in self.current_batch.values() if req.is_in_prefill()]
 
     def get_decoding_requests(self) -> List[Request]:
-        """Return list of requests currently in decode phase."""
+        """
+        Return list of requests currently in decode phase.
+
+        Returns:
+            List[Request]: Requests in decode phase.
+        """
         return [req for req in self.current_batch.values() if not req.is_in_prefill()]
 
     def get_current_batch_duration(self) -> float:
@@ -145,11 +172,9 @@ class Engine:
         Takes maximum between prefill and decode times.
 
         Returns:
-            Duration of the current step in simulation time units
+            float: Duration of the current step in simulation time units
         """
         decoding_requests = self.get_decoding_requests()
-        # for no chunking the line below is equivalent to
-        # prefill_time = sum([req.prefill_time for req in self.get_prefilling_requests()])
         prefill_time = sum(
             [req.get_current_duration() for req in self.get_prefilling_requests()]
         )

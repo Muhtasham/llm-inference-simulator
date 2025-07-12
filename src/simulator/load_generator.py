@@ -47,26 +47,28 @@ class LoadGenerator:
         Initialize the load generator with timing parameters.
 
         Args:
-            prefill_time: Time for prefill phase
-            itl: Inter-token latency
-            target_output_len_tokens: Number of tokens to generate
-            total_prefill_chunks: Number of prefill chunks
+            prefill_time (float): Time for prefill phase
+            itl (float): Inter-token latency
+            target_output_len_tokens (int): Number of tokens to generate
+            total_prefill_chunks (int): Number of prefill chunks
         """
         self.prefill_time = prefill_time
         self.itl = itl
         self.target_output_len_tokens = target_output_len_tokens
         self.total_prefill_chunks = total_prefill_chunks
 
-    def generate_load(self):
-        """Generate a single request and add it to the queue."""
+    def generate_load(self) -> None:
+        """
+        Generate a single request and add it to the queue.
+        """
         self.engine.queue.append(self.get_request(""))
 
-    def get_request(self, id_postfix):
+    def get_request(self, id_postfix: str) -> ChunkedContextRequest:
         """
         Create a new request with current parameters.
 
         Args:
-            id_postfix: Identifier suffix for the request
+            id_postfix (str): Identifier suffix for the request
 
         Returns:
             ChunkedContextRequest: New request instance
@@ -80,17 +82,23 @@ class LoadGenerator:
             added_to_queue_at=self.engine.current_time,
         )
 
-    def add_n_requests_to_queue(self, n_requests):
+    def add_n_requests_to_queue(self, n_requests: int) -> None:
         """
         Add multiple requests to the queue.
 
         Args:
-            n_requests: Number of requests to add
+            n_requests (int): Number of requests to add
         """
         for i in range(n_requests):
-            self.engine.queue.append(self.get_request(i))
+            self.engine.queue.append(self.get_request(str(i)))
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Return the string representation of the load generator class.
+
+        Returns:
+            str: The class name and parameters of the load generator.
+        """
         res = f"{self.__class__.__name__}("
         for k, v in self.__dict__.items():
             if k not in ["engine", "last_generation_time"]:
@@ -112,7 +120,7 @@ class LoadGeneratorNormalOutputLength(LoadGenerator):
 
     target_output_len_std: int = 0
 
-    def get_request(self, id_postfix):
+    def get_request(self, id_postfix: str) -> ChunkedContextRequest:
         """
         Create request with normally distributed output length.
 
@@ -172,7 +180,7 @@ class BatchLoadGenerator(LoadGeneratorNormalOutputLength):
         )
         self.initial_batch = initial_batch
 
-    def generate_load(self):
+    def generate_load(self) -> None:
         """Generate initial batch of requests only at start time."""
         if self.engine.current_time > 0:
             return
@@ -215,7 +223,7 @@ class ConcurrentLoadGenerator(LoadGeneratorNormalOutputLength):
         )
         self.target_concurrency = target_concurrency
 
-    def generate_load(self):
+    def generate_load(self) -> None:
         """Add requests to maintain target concurrency level."""
         current_concurrency = len(self.engine.get_occupied_slots())
         already_in_queue = len(self.engine.queue)
@@ -263,7 +271,7 @@ class RequestRateLoadGenerator(LoadGeneratorNormalOutputLength):
         )
         self.request_rate = request_rate
 
-    def generate_load(self):
+    def generate_load(self) -> None:
         """Generate requests at specified constant rate."""
         generate_every = 1.0 / self.request_rate
         already_generated = self.last_generation_time // generate_every
